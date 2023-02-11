@@ -7,20 +7,12 @@
                 :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
                 style="width: 100%">
                 <el-table-column
-                    label="ID"
-                    prop="id">
-                </el-table-column>
-                <el-table-column
-                    label="歌曲名称"
+                    label="短视频"
                     prop="name">
                 </el-table-column>
                 <el-table-column
-                    label="作者"
-                    prop="author">
-                </el-table-column>
-                <el-table-column
                     label="保存路径"
-                    prop="path">
+                    prop="url">
                 </el-table-column>
                 <el-table-column
                     label="操作">
@@ -50,27 +42,11 @@
 
 <script>
     import headTop from '../components/headTop'
-    import {getBgmList,delBgm} from '@/api/getData'
+    import {GET, POST} from '../request/http'
     export default {
         data(){
             return {
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                    date: '2016-05-04',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1517 弄'
-                }, {
-                    date: '2016-05-01',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1519 弄'
-                }, {
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1516 弄'
-                }],
+                tableData: [],
                 search: '',
                 limit: 10,
                 currentPage: 1,
@@ -92,19 +68,21 @@
                 this.getBgms()
             },
             async getBgms(){
-                const bgms = await getBgmList({current: this.currentPage, size: this.limit});
-                console.log(bgms)
-                this.tableData = bgms.data.records
-                this.count  = bgms.data.total
-                this.currentPage = bgms.data.current
+                const bgms =await GET('/admin/loadVideo');
+
+                this.tableData = bgms.data.list
+                // console.log(this.tableData.length)
+                this.count  = this.tableData.length
+                this.currentPage = 1
                 this.loading = false
             },
             handlePlayClick(index, row) {
-                console.log(index, row);
-                const serverUrl = 'http://localhost:8085/'
-                window.open(serverUrl+row.path,'_blank')
+                // console.log(index, row);
+                // const serverUrl = ''
+                // console.log(index)
+                window.open(row.url,'_blank')
             },
-            async handleDelete(index, row,tableData) {
+            async handleDelete(index, row, tableData) {
                 console.log(index, row);
                 let result = await delBgm({id: row.id})
                 if (result.status === 200){

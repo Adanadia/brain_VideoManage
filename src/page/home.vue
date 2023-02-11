@@ -19,7 +19,9 @@
 <script>
 	import headTop from '../components/headTop'
     import visitorPie from '../components/visitorPie'
-	import {getCount, getToday} from '@/api/getData'
+	// import {getCount, getToday} from '@/api/getData'
+    import {GET, POST} from '../request/http'
+
     export default {
     	data(){
     		return {
@@ -40,12 +42,10 @@
         },
     	methods: {
     		async initData(){
-    		    let count = await getCount()
-                this.count = count.data
-                console.log(count);
-    		    let active = await getToday()
-                this.active = active.data
-                console.log(active);
+                const Users = await GET('/admin/userList')
+                this.count = 1862
+                this.active = 685
+                // console.log(active);
             }
     	}
     }

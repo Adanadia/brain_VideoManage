@@ -3,10 +3,7 @@
         <head-top></head-top>
         <el-col :span="12" style="margin-top: 20px;">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" class="demo-ruleForm">
-            <el-form-item label="歌手" prop="author">
-                <el-input v-model="ruleForm.author"></el-input>
-            </el-form-item>
-            <el-form-item label="歌曲" prop="name">
+            <el-form-item label="视频名字" prop="name">
                 <el-input v-model="ruleForm.name"></el-input>
             </el-form-item>
             <el-form-item  prop="path">
@@ -14,11 +11,11 @@
             </el-form-item>
             <el-form-item label="请上传视频">
                 <el-upload
-                    class="upload-demo"
+                    class="upload"
                     drag
                     :on-success="handleSuccess"
                     :before-upload="beforeUpload"
-                    action="http://localhost:10000/api/admin/bgmUpload"
+                    action="/api/admin/bgmUpload"
                     name="file"
                     >
                     <i class="el-icon-upload"></i>
@@ -42,20 +39,13 @@
 	    data(){
 	        return{
                 ruleForm: {
-                    author: '',
                     name: '',
                     path: ''
                 },
                 rules: {
-                    author: [
-                        { required: true, message: '请输入歌手名称', trigger: 'blur' },
-                        { min: 1, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-                    ],
                     name: [
-                        { required: true, message: '请输入歌曲名称', trigger: 'blur' }
-                    ],
-                    path: [
-                        { required: true, message: '请上传背景音乐', trigger: 'blur' }
+                        { required: true, message: '请输入视频名称', trigger: 'blur' },
+                        { min: 1, max: 30, message: '长度在 3 到 5 个字符', trigger: 'blur' }
                     ]
                 }
             }
@@ -90,11 +80,19 @@
                 this.$refs[formName].resetFields();
             },
             beforeUpload(file) {
+                var fileSize = file.size / 1024 / 1024 < 50;
                 var FileExt = file.name.replace(/.+\./, "");//后缀
                 if (['mp4'].indexOf(FileExt.toLowerCase()) === -1){
                     this.$message({
                         type: 'warning',
                         message: '只能上传MP4文件'
+                    });
+                    return false;
+                }
+                if(!fileSize){
+                    this.$message({
+                        type: 'warning',
+                        message: '只能上传小于50MB文件'
                     });
                     return false;
                 }

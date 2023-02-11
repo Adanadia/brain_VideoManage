@@ -9,7 +9,7 @@ var opn = require('opn')
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
-var proxyMiddleware = require('http-proxy-middleware')
+const { createProxyMiddleware } = require('http-proxy-middleware');
 var webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
   : require('./webpack.dev.conf')
@@ -53,15 +53,20 @@ compiler.plugin('compilation', function (compilation) {
 var context = config.dev.context
 
 switch(process.env.NODE_ENV){
-    case 'local': var proxypath = 'http://localhost:8001'; break;
-    case 'online': var proxypath = 'http://elm.cangdu.org'; break;
+    case 'local': var proxypath = 'http://localhost:10000'; break;
+    case 'online': var proxypath = 'http://localhost:3000'; break;
 }
 var options = {
     target: proxypath,
+    pathRewrite:{
+        '^/api': '/',
+        '^/img': '/static/img'
+    },
+    ws: true,
     changeOrigin: true,
 }
 if (context.length) {
-    app.use(proxyMiddleware(context, options))
+    app.use(createProxyMiddleware(context, options))
 }
 // handle fallback for HTML5 history API
 app.use(require('connect-history-api-fallback')())

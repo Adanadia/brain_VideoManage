@@ -8,6 +8,7 @@ import axios from 'axios'
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = axios
+axios.defaults.baseURL = 'http://localhost:10000/api';
 
 Vue.use(ElementUI);
 
