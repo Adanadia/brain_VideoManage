@@ -40,6 +40,15 @@
                     property="school"
                     label="学校">
                 </el-table-column>
+                <el-table-column
+                    label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row, tableData)">删除</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
             <div class="Pagination" style="text-align: left;margin-top: 10px;">
                 <el-pagination
@@ -92,6 +101,18 @@
                 // console.log(this.tableData[0].avathor)
                 this.count  = this.tableData.length
                 this.currentPage = 1
+            },
+            async handleDelete(index, row, tableData) {
+                console.log(index, row);
+                let result = await POST('/admin/deleteUser',{sid: row.sid})
+                if (result.status === 200){
+                    this.$message({
+                        message: '删除成功',
+                        type: 'success'
+                    });
+                    tableData.splice(index, 1);
+                    this.count --
+                }
             }
         },
     }

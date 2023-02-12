@@ -7,6 +7,7 @@
 					<el-submenu index="2">
 						<template slot="title"><i class="el-icon-document"></i>用户信息</template>
 						<el-menu-item index="userList">用户列表</el-menu-item>
+                        <el-menu-item index="addUser">增加用户</el-menu-item>
 					</el-submenu>
 <!--					<el-submenu index="3">-->
 <!--						<template slot="title"><i class="el-icon-plus"></i>举报管理</template>-->

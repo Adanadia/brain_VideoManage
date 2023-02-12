@@ -6,12 +6,12 @@
  * baseImgPath: 图片存放地址
  *
  */
-let baseUrl = 'http://localhost:8085';
+let baseUrl = 'http://localhost:10000';
 let routerMode = 'hash';
 let baseImgPath;
 
 if (process.env.NODE_ENV == 'development') {
-	baseUrl = 'http://localhost:8085';
+	baseUrl = 'http://localhost:10000';
     baseImgPath = '/img/';
 }else{
 	baseUrl = '//elm.cangdu.org';

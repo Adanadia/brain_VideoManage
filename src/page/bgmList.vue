@@ -69,7 +69,6 @@
             },
             async getBgms(){
                 const bgms =await GET('/admin/loadVideo');
-
                 this.tableData = bgms.data.list
                 // console.log(this.tableData.length)
                 this.count  = this.tableData.length
@@ -84,7 +83,7 @@
             },
             async handleDelete(index, row, tableData) {
                 console.log(index, row);
-                let result = await delBgm({id: row.id})
+                let result = await POST('/admin/bgmDelete',{url: row.url})
                 if (result.status === 200){
                     this.$message({
                         message: '删除成功',

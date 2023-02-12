@@ -59,7 +59,6 @@
 
 <script>
     import headTop from '../components/headTop'
-    import {getVideoList,forbiddenVideo} from '@/api/getData'
     export default {
         data(){
             return {

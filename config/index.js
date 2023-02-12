@@ -30,7 +30,7 @@ module.exports = {
     proxyTable: { },
     context: [ //代理路径
         '/api',
-        '/img'
+        '/static'
     ],
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

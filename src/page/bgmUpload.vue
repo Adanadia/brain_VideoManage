@@ -6,26 +6,35 @@
             <el-form-item label="视频名字" prop="name">
                 <el-input v-model="ruleForm.name"></el-input>
             </el-form-item>
-            <el-form-item  prop="path">
-                <el-input type="hidden" v-model="ruleForm.path"></el-input>
-            </el-form-item>
             <el-form-item label="请上传视频">
-                <el-upload
-                    class="upload"
-                    drag
-                    :on-success="handleSuccess"
-                    :before-upload="beforeUpload"
-                    action="/api/admin/bgmUpload"
-                    name="file"
-                    >
-                    <i class="el-icon-upload"></i>
-                    <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                    <div class="el-upload__tip" slot="tip">只能上传MP4文件</div>
+                <el-upload class="avatar-uploader"
+                           action="api/admin/bgmUpload"
+                           :on-progress="uploadVideoProcess"
+                           :on-success="handleVideoSuccess"
+                           :before-upload="beforeUpload"
+                           :limit="1"
+                           name = 'video'
+                           v-bind:show-file-list="false">
+                    <video v-if="videoForm.showVideoPath !=='' && !videoFlag"
+                           v-bind:src="videoForm.showVideoPath"
+                           class="avatar video-avatar"
+                           controls="controls">
+                        您的浏览器不支持视频播放
+                    </video>
+                    <i v-else-if="videoForm.showVideoPath ==='' && !videoFlag"
+                       class="el-icon-plus avatar-uploader-icon"></i>
+                    <el-progress v-if="videoFlag === true"
+                                 type="circle"
+                                 v-bind:percentage="videoUploadPercent"
+                                 style="margin-top:7px;"></el-progress>
                 </el-upload>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')">立即上传</el-button>
-                <el-button @click="resetForm('ruleForm')">重置</el-button>
+                <el-tooltip class="item" effect="dark" content="视频存储服务数据库中可能有不存在的索引，即视频文件不在redis缓存且永远不会再被索引，点击此按钮清除无效视频文件，释放空间" placement="bottom-start">
+                    <el-button @click="clearCache">整理存储空间</el-button>
+                </el-tooltip>
+
             </el-form-item>
         </el-form>
         </el-col>
@@ -34,19 +43,29 @@
 
 <script>
 	import headTop from '../components/headTop'
-    import {addBgm} from "../api/getData";
+    // import {addBgm} from "../api/getData";
+    import {POST, GET} from "../request/http"
     export default {
 	    data(){
 	        return{
                 ruleForm: {
                     name: '',
-                    path: ''
+                    url: ''
                 },
                 rules: {
                     name: [
                         { required: true, message: '请输入视频名称', trigger: 'blur' },
-                        { min: 1, max: 30, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-                    ]
+                        { min: 1, max: 30, message: '长度在 1 到 30 个字符', trigger: 'blur' }
+                    ],
+                },
+                videoFlag: false,
+                //是否显示进度条
+                videoUploadPercent: "",
+                //进度条的进度，
+                isShowUploadVideo: false,
+                //显示上传按钮
+                videoForm: {
+                    showVideoPath: ''
                 }
             }
         },
@@ -54,15 +73,11 @@
     		headTop,
     	},
         methods:{
-            handleSuccess(res, file) {
-                this.ruleForm.path = res.data
-                console.log(res.data)
-            },
             submitForm(formName) {
                 this.$refs[formName].validate(async (valid) => {
-                    if (valid) {
+                    if (valid && this.ruleForm.url !== '') {
                         console.log(this.ruleForm)
-                        let result = await addBgm(this.ruleForm)
+                        let result = await POST('/admin/uploadProcess', this.ruleForm)
                         if (result.status === 200){
                             this.$message({
                                 type: 'success',
@@ -71,10 +86,27 @@
                             this.$router.push('/bgmList')
                         }
                     } else {
-                        console.log('error submit!!');
+                        this.$message({
+                            message: '请输入完整信息',
+                            type: 'error'
+                        });
                         return false;
                     }
                 })
+            },
+            async clearCache() {
+                let res = await GET('/admin/clearCache')
+                if(res.status === 200){
+                    this.$message({
+                        type: 'success',
+                        message: '清理缓存成功'
+                    });
+                }else {
+                    this.$message({
+                        type: 'error',
+                        message: '请稍后再试'
+                    });
+                }
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
@@ -95,6 +127,28 @@
                         message: '只能上传小于50MB文件'
                     });
                     return false;
+                }
+            },
+            //进度条
+            uploadVideoProcess(event, file, fileList) {
+                this.videoFlag = true;
+                this.videoUploadPercent = file.percentage.toFixed(0) * 1;
+            },
+            //上传成功回调
+            handleVideoSuccess(res, file) {
+                this.isShowUploadVideo = true;
+                this.videoFlag = false;
+                this.videoUploadPercent = 0;
+
+
+                if (res.Code === 0) {
+                    this.videoForm.showVideoPath = res.Data;
+                    this.ruleForm.url = res.Data;
+                } else {
+                    this.$message({
+                        message: '上传失败',
+                        type: 'error'
+                    });
                 }
             }
         }

@@ -60,7 +60,7 @@ var options = {
     target: proxypath,
     pathRewrite:{
         '^/api': '/',
-        '^/img': '/static/img'
+        '^/static': '/static/'
     },
     ws: true,
     changeOrigin: true,

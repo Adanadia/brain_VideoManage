@@ -63,7 +63,7 @@
 
 <script>
     import headTop from '../components/headTop'
-    import {getReportsList,forbidVideo} from '@/api/getData'
+    // import {getReportsList,forbidVideo} from '@/api/getData'
     export default {
         data(){
             return {
